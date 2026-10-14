@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ video.title }} · FrameFlow{% endblock %}
+{% block content %}
+<main class="page watch-page">
+  <a class="back-link" href="{{ url_for('index') }}">← Back to library</a>
+  <section class="player-wrap">
+    <video class="video-player" controls preload="metadata" playsinline>
+      <source src="{{ url_for('media', filename=video.stored_filename) }}">
+      Your browser does not support HTML5 video.
+    </video>
+  </section>
+  <section class="watch-details">
+    <div><p class="eyebrow">NOW PLAYING</p><h1>{{ video.title }}</h1><p class="watch-description">{{ video.description or "No description provided for this video." }}</p><p class="video-meta">{{ (video.file_size / 1048576)|round(1) }} MB · Uploaded {{ video.created_at[:10] }}</p></div>
+    <a class="secondary-button" href="{{ url_for('dashboard') }}">Manage library</a>
+  </section>
+  {% if related %}
+  <section class="library-section related-section"><div class="section-heading"><div><p class="eyebrow">KEEP WATCHING</p><h2>More from your library</h2></div></div>
+    <div class="video-grid">
+      {% for item in related %}
+      <a class="video-card" href="{{ url_for('watch', video_id=item.id) }}">
+        <div class="video-thumb">{% if item.thumbnail_filename %}<img src="{{ url_for('thumbnail', filename=item.thumbnail_filename) }}" alt="">{% else %}<div class="thumb-placeholder"><span>▶</span><small>FRAMEFLOW</small></div>{% endif %}<span class="play-overlay">▶</span></div>
+        <div class="video-info"><h3>{{ item.title }}</h3><p>{{ item.description or "No description added." }}</p></div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</main>
+{% endblock %}

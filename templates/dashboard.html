@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · FrameFlow{% endblock %}
+{% block content %}
+<main class="page dashboard-page">
+  <section class="dashboard-heading">
+    <div><p class="eyebrow">CREATOR STUDIO</p><h1>Your dashboard</h1><p class="muted">Manage your video library and add something new.</p></div>
+    <a class="secondary-button" href="{{ url_for('index') }}">← Back to library</a>
+  </section>
+
+  <section class="stats-grid">
+    <div class="stat-card"><span class="stat-label">TOTAL VIDEOS</span><strong>{{ video_count }}</strong><span class="stat-note">In your library</span></div>
+    <div class="stat-card"><span class="stat-label">LOCAL STORAGE</span><strong>{{ (total_bytes / 1073741824)|round(2) }} GB</strong><span class="stat-note">Video file size total</span></div>
+    <div class="stat-card"><span class="stat-label">FFMPEG</span><strong class="status-text">{{ "Ready" if ffmpeg_available else "Optional" }}</strong><span class="stat-note">{{ "Thumbnails enabled" if ffmpeg_available else "Not detected in PATH" }}</span></div>
+  </section>
+
+  <section class="dashboard-columns">
+    <div class="panel upload-panel">
+      <div class="panel-heading"><div><p class="eyebrow">ADD TO LIBRARY</p><h2>Upload a video</h2></div><span class="panel-icon">↑</span></div>
+      <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="upload-form">
+        <label for="title">Video title</label>
+        <input id="title" name="title" type="text" maxlength="120" placeholder="e.g. A weekend in the mountains" required>
+        <label for="description">Description <span class="optional">(optional)</span></label>
+        <textarea id="description" name="description" rows="4" maxlength="2000" placeholder="Tell viewers a little about this video..."></textarea>
+        <label for="video">Video file</label>
+        <label class="file-drop" for="video"><span class="upload-cloud">↑</span><strong id="file-label">Choose a video to upload</strong><small>MP4, WebM, MOV, M4V, OGV · Up to configured limit</small><input id="video" name="video" type="file" accept="video/mp4,video/webm,video/quicktime,video/ogg,.m4v" required></label>
+        <div class="upload-progress" id="upload-progress" hidden><span></span></div>
+        <button class="primary-button full-button" type="submit">Upload video <span>↗</span></button>
+      </form>
+      <p class="form-note">Local demo: videos are stored on this computer, not in the cloud.</p>
+    </div>
+
+    <div class="panel manage-panel">
+      <div class="panel-heading"><div><p class="eyebrow">YOUR CONTENT</p><h2>Manage videos</h2></div></div>
+      {% if videos %}
+        <div class="manage-list">
+          {% for video in videos %}
+            <div class="manage-item">
+              <div class="mini-thumb">{% if video.thumbnail_filename %}<img src="{{ url_for('thumbnail', filename=video.thumbnail_filename) }}" alt="">{% else %}▶{% endif %}</div>
+              <div class="manage-info"><strong>{{ video.title }}</strong><small>{{ (video.file_size / 1048576)|round(1) }} MB · {{ video.created_at[:10] }}</small><a href="{{ url_for('watch', video_id=video.id) }}">Watch video ↗</a></div>
+              <form action="{{ url_for('delete', video_id=video.id) }}" method="post" onsubmit="return confirm('Delete this video permanently?')"><button class="delete-button" type="submit" aria-label="Delete {{ video.title }}">×</button></form>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-manage"><span>▤</span><p>No uploads yet. Your videos will appear here.</p></div>
+      {% endif %}
+    </div>
+  </section>
+</main>
+{% endblock %}

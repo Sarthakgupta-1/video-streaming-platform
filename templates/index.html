@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Explore videos · FrameFlow{% endblock %}
+{% block content %}
+<main class="page">
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">YOUR VIDEO SPACE</p>
+      <h1>Stories worth<br><span>pressing play for.</span></h1>
+      <p class="hero-description">Upload, organize, and stream your favorite videos in one simple place.</p>
+      <a class="primary-button" href="{{ url_for('dashboard') }}">Upload a video <span>↗</span></a>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+      <div class="art-screen"><div class="art-screen-inner"><span class="play-symbol">▶</span></div></div>
+      <span class="art-tag tag-one">CREATE</span><span class="art-tag tag-two">STREAM</span>
+    </div>
+  </section>
+
+  <section class="library-section">
+    <div class="section-heading">
+      <div><p class="eyebrow">THE LIBRARY</p><h2>Recently uploaded</h2></div>
+      <span class="count-pill">{{ videos|length }} videos</span>
+    </div>
+    {% if videos %}
+      <div class="video-grid">
+        {% for video in videos %}
+          <a class="video-card" href="{{ url_for('watch', video_id=video.id) }}">
+            <div class="video-thumb">
+              {% if video.thumbnail_filename %}
+                <img src="{{ url_for('thumbnail', filename=video.thumbnail_filename) }}" alt="">
+              {% else %}
+                <div class="thumb-placeholder"><span>▶</span><small>FRAMEFLOW</small></div>
+              {% endif %}
+              <span class="play-overlay">▶</span>
+            </div>
+            <div class="video-info">
+              <h3>{{ video.title }}</h3>
+              <p>{{ video.description or "No description added." }}</p>
+              <span class="video-meta">{{ (video.file_size / 1048576)|round(1) }} MB · {{ video.created_at[:10] }}</span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state"><div class="empty-icon">▶</div><h3>Your library starts here</h3><p>Upload your first video to see it appear in this collection.</p><a class="secondary-button" href="{{ url_for('dashboard') }}">Go to dashboard</a></div>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}
